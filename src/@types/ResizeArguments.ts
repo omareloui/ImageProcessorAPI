@@ -1,5 +1,5 @@
 export interface ResizeArguments {
-  filename?: string;
+  filename: string;
   h?: string;
   w?: string;
 }

@@ -4,11 +4,15 @@ import config from "./config";
 
 import routes from "./routes";
 
+import { errorHandler } from "./utils";
+
 const { port, isTestEnv } = config;
 
 const app = Express();
 
 app.use(routes);
+
+app.use(errorHandler);
 
 function init() {
   app.listen(port, () => {
