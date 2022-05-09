@@ -1,17 +1,19 @@
 import Express from "express";
-
-import config from "./config";
+import morgan from "morgan";
+import helmet from "helmet";
 
 import routes from "./routes";
-
 import { errorHandler } from "./utils";
 
-const { port, isTestEnv } = config;
+import config from "./config";
+const { port, isProd, isTestEnv } = config;
 
 const app = Express();
 
-app.use(routes);
+app.use(helmet());
+if (!isTestEnv) app.use(morgan(isProd ? "combined" : "dev"));
 
+app.use(routes);
 app.use(errorHandler);
 
 function init() {
