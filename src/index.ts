@@ -1,3 +1,5 @@
+import "dotenv/config";
+
 import Express from "express";
 import morgan from "morgan";
 import helmet from "helmet";
