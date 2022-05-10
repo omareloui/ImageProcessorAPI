@@ -1,7 +1,7 @@
 import { Router } from "express";
 
-import resizeRoutes from "./resize";
-import placeholderRoutes from "./placeholder";
+import resizeRoutes from "./resize.routes";
+import placeholderRoutes from "./placeholder.routes";
 
 const routes = Router();
 

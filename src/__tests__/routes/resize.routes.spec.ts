@@ -1,6 +1,6 @@
 import supertest from "supertest";
-import { app } from "..";
-import { FSHelper } from "../lib";
+import { app } from "../..";
+import { FSHelper } from "../../lib";
 
 const request = supertest(app);
 
@@ -31,6 +31,11 @@ describe("Resize endpoint", () => {
     it("should response with 200 status code on providing a filename and at least one dimension on /resize", async () => {
       const res = await request.get("/resize?filename=fjord.jpg&h=400");
       expect(res.status).toBe(200);
+    });
+
+    it("should response with 304 status code on requesting a cached image on /resize", async () => {
+      const res = await request.get("/resize?filename=fjord.jpg&h=400");
+      expect(res.status).toBe(304);
     });
 
     it("should response with 400 status code on providing a filename and one invalid dimension on /resize", async () => {
