@@ -15,7 +15,9 @@ const app = Express();
 app.use(helmet());
 if (!isTestEnv) app.use(morgan(isProd ? "combined" : "dev"));
 
-app.use(routes);
+app.use(Express.static("./public"));
+
+app.use("/api", routes);
 app.use(errorHandler);
 
 function init() {
