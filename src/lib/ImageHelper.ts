@@ -1,25 +1,56 @@
 import sharp from "sharp";
 
-import { CreatePlaceholderArguments, ResizeArguments } from "../@types";
+import {
+  ImagePlaceholderOptions,
+  ImagePlaceholderReturn,
+  ResizeImageOptions,
+  ResizeImageReturn,
+} from "../@types";
 import { FSHelper } from "./FSHelper";
 import { ColorHelper } from "./ColorHelper";
 
-export class ImageHelper {
-  private static IMAGES_DIR = "./public/images";
-  private static CACHE_DIR = FSHelper.joinPath(this.IMAGES_DIR, "cache");
-  private static PLACEHOLDER_FILENAME = "placeholder.jpg";
+interface CacheImagePathOptions {
+  filename: string;
+  newExt?: string;
+  w?: number;
+  h?: number;
+}
 
-  static async createPlaceholder(query: any) {
+interface CacheOptions {
+  shouldCache?: boolean;
+  cacheDir?: string;
+}
+
+export class ImageHelper {
+  static IMAGES_DIR = "./public/images";
+  static CACHE_DIR = FSHelper.joinPath(this.IMAGES_DIR, "cache");
+
+  static PLACEHOLDER_FILENAME = "placeholder";
+  static PLACEHOLDER_DEFAULT_FILETYPE = "webp" as const;
+
+  static async createPlaceholder(
+    query: any,
+    { shouldCache = true, cacheDir = this.CACHE_DIR }: CacheOptions = {}
+  ): Promise<ImagePlaceholderReturn> {
     const options = this.parseCreatePlaceholderOptions(query);
     this.validateCreatePlaceholderOptions(options);
 
     const { w, h, color } = options;
+    const filetype = this.PLACEHOLDER_DEFAULT_FILETYPE;
 
-    const imageFromCache = await this.getFromCache({
+    const imageFromCache = await this.getFromCache(cacheDir, {
       ...options,
-      filename: this.PLACEHOLDER_FILENAME,
+      filename: FSHelper.addExtension(
+        ImageHelper.PLACEHOLDER_FILENAME,
+        filetype
+      ),
     });
-    if (imageFromCache) return imageFromCache;
+    if (imageFromCache)
+      return {
+        image: imageFromCache,
+        isFromCache: true,
+        filetype,
+      };
 
     const newImageBuffer = await sharp({
       create: {
@@ -29,55 +60,98 @@ export class ImageHelper {
         channels: 3,
       },
     })
-      .jpeg()
+      .toFormat(filetype)
       .toBuffer();
 
-    await this.cacheImage(
-      { ...options, filename: this.PLACEHOLDER_FILENAME },
-      newImageBuffer
-    );
+    if (shouldCache)
+      await this.cacheImage(
+        cacheDir,
+        {
+          ...options,
+          filename: FSHelper.addExtension(
+            ImageHelper.PLACEHOLDER_FILENAME,
+            filetype
+          ),
+        },
+        newImageBuffer
+      );
 
-    return newImageBuffer;
+    return { image: newImageBuffer, isFromCache: false, filetype };
   }
 
-  static async resizeImage(query: any) {
+  static async resize(
+    query: any,
+    { shouldCache = true, cacheDir = this.CACHE_DIR }: CacheOptions = {}
+  ): Promise<ResizeImageReturn> {
     const options = this.parseResizeOptions(query);
     this.validateResizeOptions(options);
 
-    const { filename, w, h } = options;
+    const { filename, w, h, filetype } = options;
 
     const imageSrc = FSHelper.resolvePath(this.IMAGES_DIR, filename);
-
     await this.validateImageExistence(imageSrc);
 
-    const imageFromCache = await this.getFromCache(options);
-    if (imageFromCache) return imageFromCache;
+    const imageFromCache = await this.getFromCache(cacheDir, {
+      ...options,
+      newExt: filetype as string,
+      filename,
+    });
+    if (imageFromCache)
+      return {
+        image: imageFromCache,
+        isFromCache: true,
+        filetype: filetype as string,
+      };
 
-    const newImageBuffer = await sharp(imageSrc).resize(w, h).toBuffer();
+    const newImageBuffer = await sharp(imageSrc)
+      .resize(w, h)
+      .toFormat(filetype)
+      .toBuffer();
 
-    await this.cacheImage(options, newImageBuffer);
+    if (shouldCache)
+      await this.cacheImage(
+        cacheDir,
+        {
+          ...options,
+          newExt: filetype as string,
+          filename,
+        },
+        newImageBuffer
+      );
 
-    return newImageBuffer;
+    return {
+      image: newImageBuffer,
+      isFromCache: false,
+      filetype: filetype as string,
+    };
   }
 
-  static async removeCache() {
-    await FSHelper.removeDirRecursively(this.CACHE_DIR);
+  static removeCache(cacheDir = this.CACHE_DIR) {
+    return FSHelper.removeDirRecursively(cacheDir);
   }
 
   // ====== utils ====== //
   // --- Parse --- //
   private static parseCreatePlaceholderOptions(
     query: any
-  ): Partial<CreatePlaceholderArguments> {
+  ): Partial<ImagePlaceholderOptions> {
     const color = query.color || query.clr;
     const { w, h } = this.parseSize(query);
     return { color, w, h };
   }
 
-  private static parseResizeOptions(query: any): Partial<ResizeArguments> {
+  private static parseResizeOptions(query: any): Partial<ResizeImageOptions> {
     const filename = query.filename || query.file || query.image;
+    const filetype =
+      query.ext ||
+      query.extension ||
+      query.filetype ||
+      query.format ||
+      FSHelper.getExtension(filename || "") ||
+      "webp";
+
     const { w, h } = this.parseSize(query);
-    return { filename, w, h };
+    return { filename, w, h, filetype };
   }
 
   private static parseSize(query: any) {
@@ -92,45 +166,64 @@ export class ImageHelper {
 
   // --- Validate --- //
   private static validateCreatePlaceholderOptions(
-    options: Partial<CreatePlaceholderArguments>
-  ): asserts options is CreatePlaceholderArguments {
+    options: Partial<ImagePlaceholderOptions>
+  ): asserts options is ImagePlaceholderOptions {
     const { w, h } = options;
     if (!w) throw new Error("You have to provide a width.");
     if (!h) throw new Error("You have to provide a height.");
   }
 
   private static validateResizeOptions(
-    options: Partial<ResizeArguments>
-  ): asserts options is ResizeArguments {
+    options: Partial<ResizeImageOptions>
+  ): asserts options is ResizeImageOptions {
     const { filename, w, h } = options;
     if (!filename) throw new Error("You have to provide a filename.");
     if (!w && !h) throw new Error("You have to provide a size.");
+    if (
+      options.filetype &&
+      ![...Object.keys(sharp.format), "jpg"].includes(
+        options.filetype as string
+      )
+    )
+      throw new Error("You have to provide a valid file format.");
   }
 
   private static async validateImageExistence(path: string) {
     const fileExists = await FSHelper.validateExistence(path);
-    if (!fileExists) throw new Error("Can't find the required file.");
+    if (!fileExists) throw new Error("Can't find the requested file.");
   }
 
   // --- Cache --- //
-  private static async cacheImage(options: ResizeArguments, image: Buffer) {
-    const dist = this.getCachedImagePath(options);
-    await FSHelper.ensureDir(this.CACHE_DIR);
+  private static async cacheImage(
+    cacheDir: string,
+    options: CacheImagePathOptions,
+    image: Buffer
+  ) {
+    const dist = this.getCachedImagePath(cacheDir, options);
+    await FSHelper.ensureDir(cacheDir);
     await FSHelper.createFile(dist, image);
   }
 
-  private static async getFromCache(options: ResizeArguments) {
-    const src = this.getCachedImagePath(options);
+  private static async getFromCache(
+    cacheDir: string,
+    options: CacheImagePathOptions
+  ): Promise<Buffer | false> {
+    const src = this.getCachedImagePath(cacheDir, options);
     const exists = await FSHelper.validateExistence(src);
-    if (exists) return FSHelper.readFile(src);
+    if (exists) return (await FSHelper.readFile(src)) as Buffer;
     return false;
   }
 
-  private static getCachedImagePath({ w, h, filename }: ResizeArguments) {
+  static getCachedImagePath(
+    cacheDir: string,
+    { w, h, filename, newExt }: CacheImagePathOptions
+  ) {
     let name = "";
     if (w) name += w;
     if (h) name += `x${h}`;
     name += `_${filename}`;
-    return FSHelper.resolvePath(this.CACHE_DIR, name);
+    if (newExt) name = FSHelper.replaceExtension(name, newExt);
+
+    return FSHelper.resolvePath(cacheDir, name);
   }
 }

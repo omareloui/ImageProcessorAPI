@@ -1,5 +1,5 @@
 import { promises as fs } from "fs";
-import { resolve, join, sep } from "path";
+import { resolve, join, sep, extname } from "path";
 import rimraf from "rimraf";
 
 export class FSHelper {
@@ -46,5 +46,22 @@ export class FSHelper {
         res(true);
       });
     });
+  }
+
+  static addExtension(path: string, ext: string) {
+    return `${path}.${ext}`;
+  }
+
+  static removeExtension(path: string) {
+    return path.replace(/\.[^/.]+$/, "");
+  }
+
+  static replaceExtension(path: string, newExt: string) {
+    const withoutExt = this.removeExtension(path);
+    return this.addExtension(withoutExt, newExt);
+  }
+
+  static getExtension(path: string) {
+    return extname(path).split(".")[1];
   }
 }

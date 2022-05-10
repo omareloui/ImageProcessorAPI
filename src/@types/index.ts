@@ -1,2 +1,2 @@
-export * from "./ResizeArguments";
-export * from "./CreatePlaceholderArguments";
+export * from "./ResizeImage";
+export * from "./ImagePlaceholder";

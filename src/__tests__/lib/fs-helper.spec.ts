@@ -133,4 +133,32 @@ describe("FSHelper (file system helper)", () => {
       expect(filesExistence.every(_x => true)).toBe(true);
     });
   });
+
+  describe("addExtension", () => {
+    it('should add "png" extension to "filename" (filename.png)', () => {
+      const filename = FSHelper.addExtension("filename", "png");
+      expect(filename).toEqual("filename.png");
+    });
+  });
+
+  describe("removeExtension", () => {
+    it('should remove extension "png" from "filename.png" (filename)', () => {
+      const filename = FSHelper.removeExtension("filename.png");
+      expect(filename).toEqual("filename");
+    });
+  });
+
+  describe("replaceExtension", () => {
+    it('should replace "png" extension with "jpeg" extension', () => {
+      const filename = FSHelper.replaceExtension("filename.png", "jpeg");
+      expect(filename).toEqual("filename.jpeg");
+    });
+  });
+
+  describe("getExtension", () => {
+    it('should get the file extension of "filename.png" (png)', () => {
+      const ext = FSHelper.getExtension("filename.png");
+      expect(ext).toEqual("png");
+    });
+  });
 });

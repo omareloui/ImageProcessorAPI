@@ -1,6 +1,6 @@
 import { ColorHelper } from "../../lib";
 
-describe("Color helper", () => {
+describe("ColorHelper", () => {
   it("should generate a hex color with 7 string value", () => {
     const color = ColorHelper.generateRandom();
     expect(color.length).toBe(7);
