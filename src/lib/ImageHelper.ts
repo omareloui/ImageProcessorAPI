@@ -1,11 +1,12 @@
 import sharp from "sharp";
 
 import { CreatePlaceholderArguments, ResizeArguments } from "../@types";
-import { FSHelper } from ".";
+import { FSHelper } from "./FSHelper";
 import { ColorHelper } from "./ColorHelper";
 
 export class ImageHelper {
-  private static CACHE_DIR = "./images/cache";
+  private static IMAGES_DIR = "./public/images";
+  private static CACHE_DIR = FSHelper.joinPath(this.IMAGES_DIR, "cache");
   private static PLACEHOLDER_FILENAME = "placeholder.jpg";
 
   static async createPlaceholder(query: any) {
@@ -14,7 +15,7 @@ export class ImageHelper {
 
     const { w, h, color } = options;
 
-    const imageFromCache = await this.getThumbFromCache({
+    const imageFromCache = await this.getFromCache({
       ...options,
       filename: this.PLACEHOLDER_FILENAME,
     });
@@ -45,11 +46,11 @@ export class ImageHelper {
 
     const { filename, w, h } = options;
 
-    const imageSrc = FSHelper.resolvePath(`./images/${filename}`);
+    const imageSrc = FSHelper.resolvePath(this.IMAGES_DIR, filename);
 
     await this.validateImageExistence(imageSrc);
 
-    const imageFromCache = await this.getThumbFromCache(options);
+    const imageFromCache = await this.getFromCache(options);
     if (imageFromCache) return imageFromCache;
 
     const newImageBuffer = await sharp(imageSrc).resize(w, h).toBuffer();
@@ -113,19 +114,19 @@ export class ImageHelper {
 
   // --- Cache --- //
   private static async cacheImage(options: ResizeArguments, image: Buffer) {
-    const dist = this.getThumbPath(options);
+    const dist = this.getCachedImagePath(options);
     await FSHelper.ensureDir(this.CACHE_DIR);
     await FSHelper.createFile(dist, image);
   }
 
-  private static async getThumbFromCache(options: ResizeArguments) {
-    const src = this.getThumbPath(options);
+  private static async getFromCache(options: ResizeArguments) {
+    const src = this.getCachedImagePath(options);
     const exists = await FSHelper.validateExistence(src);
     if (exists) return FSHelper.readFile(src);
     return false;
   }
 
-  private static getThumbPath({ w, h, filename }: ResizeArguments) {
+  private static getCachedImagePath({ w, h, filename }: ResizeArguments) {
     let name = "";
     if (w) name += w;
     if (h) name += `x${h}`;

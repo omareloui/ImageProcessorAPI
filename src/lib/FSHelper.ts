@@ -1,10 +1,14 @@
 import { promises as fs } from "fs";
-import { resolve } from "path";
+import { resolve, join } from "path";
 import rimraf from "rimraf";
 
 export class FSHelper {
   static resolvePath(...paths: string[]) {
     return resolve(...paths);
+  }
+
+  static joinPath(...paths: string[]) {
+    return join(...paths);
   }
 
   static async validateExistence(path: string) {
