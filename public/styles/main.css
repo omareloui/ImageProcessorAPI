@@ -59,10 +59,6 @@
   text-decoration: none;
 }
 
-footer > div {
-  margin: 60px 0;
-}
-
 /* ====== Media Queries ====== */
 @media screen and (max-width: 720px) {
   .available-images .grid {

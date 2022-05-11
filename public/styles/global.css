@@ -23,7 +23,8 @@ body {
   background: var(--clr-body-bg);
 }
 
-h1 {
+h1,
+footer > div {
   margin: 50px 0;
 }
 

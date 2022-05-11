@@ -15,6 +15,17 @@ export class ImagesController {
     res.send(prefixedImages);
   };
 
+  public static get: RequestHandler = async (req, res) => {
+    const { image } = req.params;
+
+    // TODO: validate if it exists
+
+    res.send({
+      link: `/${ImageHelper.IMAGES_FOLDER_NAME}/${image}`,
+      filename: image,
+    });
+  };
+
   public static saveImage: RequestHandler = async (req, res, next) => {
     try {
       const { file } = req;

@@ -10,4 +10,6 @@ routes
   .get(ImagesController.getAll)
   .post(upload.single("image"), ImagesController.saveImage);
 
+routes.route("/images/:image").get(ImagesController.get);
+
 export default routes;

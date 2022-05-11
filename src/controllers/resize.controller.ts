@@ -6,10 +6,8 @@ export class ResizeController {
   public static resize: RequestHandler = async (req, res, next) => {
     const options = req.query;
     try {
-      const { image, filetype, isFromCache } = await ImageHelper.resize(
-        options
-      );
-      res.writeHead(isFromCache ? 304 : 200, {
+      const { image, filetype } = await ImageHelper.resize(options);
+      res.writeHead(200, {
         "Content-Type": `image/${filetype}`,
         "Content-Length": image.length,
       });
