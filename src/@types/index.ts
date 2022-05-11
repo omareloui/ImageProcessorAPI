@@ -1,2 +1,2 @@
-export * from "./ResizeImage";
+export * from "./OperateImage";
 export * from "./ImagePlaceholder";

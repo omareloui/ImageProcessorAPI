@@ -3,8 +3,8 @@ import sharp from "sharp";
 import {
   ImagePlaceholderOptions,
   ImagePlaceholderReturn,
-  ResizeImageOptions,
-  ResizeImageReturn,
+  OperateImageOptions,
+  OperateImageReturn,
 } from "../@types";
 import { FSHelper } from "./FSHelper";
 import { ColorHelper } from "./ColorHelper";
@@ -80,12 +80,12 @@ export class ImageHelper {
     return { image: newImageBuffer, isFromCache: false, filetype };
   }
 
-  static async resize(
+  static async operate(
     query: any,
     { shouldCache = true, cacheDir = this.CACHE_DIR }: CacheOptions = {}
-  ): Promise<ResizeImageReturn> {
-    const options = this.parseResizeOptions(query);
-    this.validateResizeOptions(options);
+  ): Promise<OperateImageReturn> {
+    const options = this.parseOperateOptions(query);
+    this.validateOperateOptions(options);
 
     const { filename, w, h, filetype } = options;
 
@@ -141,7 +141,7 @@ export class ImageHelper {
     return { color, w, h };
   }
 
-  private static parseResizeOptions(query: any): Partial<ResizeImageOptions> {
+  private static parseOperateOptions(query: any): Partial<OperateImageOptions> {
     const filename = query.filename || query.file || query.image;
     const filetype =
       query.ext ||
@@ -174,9 +174,9 @@ export class ImageHelper {
     if (!h) throw new Error("You have to provide a height.");
   }
 
-  private static validateResizeOptions(
-    options: Partial<ResizeImageOptions>
-  ): asserts options is ResizeImageOptions {
+  private static validateOperateOptions(
+    options: Partial<OperateImageOptions>
+  ): asserts options is OperateImageOptions {
     const { filename, w, h } = options;
     if (!filename) throw new Error("You have to provide a filename.");
     if (!w && !h) throw new Error("You have to provide a size.");

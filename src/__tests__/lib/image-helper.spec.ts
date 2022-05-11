@@ -123,25 +123,25 @@ describe("ImageHelper", () => {
     });
   });
 
-  describe("resizeImage", () => {
+  describe("operate", () => {
     afterAll(async () => {
       await ImageHelper.removeCache(CACHE_MOCK_DIR);
     });
 
-    type ResizeImageParams = Parameters<typeof ImageHelper.resize>;
+    type OperateImageParams = Parameters<typeof ImageHelper.operate>;
 
-    const resize = (
-      options: ResizeImageParams[0],
+    const operate = (
+      options: OperateImageParams[0],
       {
         cacheDir = CACHE_MOCK_DIR,
         shouldCache = false,
-      }: ResizeImageParams[1] = {}
-    ) => ImageHelper.resize(options, { cacheDir, shouldCache });
+      }: OperateImageParams[1] = {}
+    ) => ImageHelper.operate(options, { cacheDir, shouldCache });
 
     it("should throw an error on not providing at least one dimension", async () => {
       let msg = "";
       try {
-        await resize({ filename: "santamonica.jpg" });
+        await operate({ filename: "santamonica.jpg" });
       } catch (e) {
         const err = e as Error;
         msg = err.message;
@@ -152,7 +152,7 @@ describe("ImageHelper", () => {
     it("should throw an error on providing both dimensions with invalid numbers", async () => {
       let msg = "";
       try {
-        await resize({ filename: "santamonica.jpg", width: "text" });
+        await operate({ filename: "santamonica.jpg", width: "text" });
       } catch (e) {
         const err = e as Error;
         msg = err.message;
@@ -163,7 +163,7 @@ describe("ImageHelper", () => {
     it("should throw an error on not providing a filename", async () => {
       let msg = "";
       try {
-        await resize({ width: "300" });
+        await operate({ width: "300" });
       } catch (e) {
         const err = e as Error;
         msg = err.message;
@@ -174,7 +174,7 @@ describe("ImageHelper", () => {
     it("should throw an error if the requested file can't be found", async () => {
       let msg = "";
       try {
-        await resize({ filename: "some_invalid_filename.jpg", width: "300" });
+        await operate({ filename: "some_invalid_filename.jpg", width: "300" });
       } catch (e) {
         const err = e as Error;
         msg = err.message;
@@ -183,14 +183,14 @@ describe("ImageHelper", () => {
     });
 
     it("should work with on providing one of the two dimensions", async () => {
-      const { image } = await resize({ filename: "santamonica.jpg", h: 200 });
+      const { image } = await operate({ filename: "santamonica.jpg", h: 200 });
       expect(image).toBeTruthy();
     });
 
     it("should throw an error on providing an invalid extension", async () => {
       let msg = "";
       try {
-        await resize({
+        await operate({
           filename: "santamonica.jpg",
           h: 200,
           extension: "invalid_ext",
@@ -210,7 +210,7 @@ describe("ImageHelper", () => {
           h: 200,
           extension,
         };
-        const { filetype } = await resize(options, { shouldCache: true });
+        const { filetype } = await operate(options, { shouldCache: true });
 
         expect(filetype).toBe(extension);
 
@@ -234,7 +234,7 @@ describe("ImageHelper", () => {
           h: 200,
           extension,
         };
-        const { filetype } = await resize(options, { shouldCache: true });
+        const { filetype } = await operate(options, { shouldCache: true });
 
         expect(filetype).toBe(extension);
 
@@ -258,7 +258,7 @@ describe("ImageHelper", () => {
         h: 500,
         extension,
       };
-      const { isFromCache } = await resize(options, { shouldCache: true });
+      const { isFromCache } = await operate(options, { shouldCache: true });
       expect(isFromCache).toBeFalse();
 
       const cacheImagePath = ImageHelper.getCachedImagePath(CACHE_MOCK_DIR, {
@@ -276,8 +276,8 @@ describe("ImageHelper", () => {
         h: 500,
         extension,
       };
-      await resize(options, { shouldCache: true });
-      const { isFromCache } = await resize(options, { shouldCache: true });
+      await operate(options, { shouldCache: true });
+      const { isFromCache } = await operate(options, { shouldCache: true });
       expect(isFromCache).toBeTrue();
     });
   });

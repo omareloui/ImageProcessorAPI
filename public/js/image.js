@@ -42,7 +42,7 @@ Alpine.store("resizeForm", {
   generateLink({ image, width, height }) {
     if (!width && !height) return Alpine.store("image").image.link;
 
-    let link = `/api/resize?filename=${image}`;
+    let link = `/api/operate?filename=${image}`;
 
     if (width) link += `&w=${width}`;
     if (height) link += `&h=${height}`;
