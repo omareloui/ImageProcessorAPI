@@ -13,16 +13,74 @@
   </head>
 
   <body>
-    <main class="container">
-      <h1 class="center-text">Image Processor</h1>
+    <h1 class="center-text">Image Processor</h1>
 
-      <div class="available-images" x-data="{ posts: [{title: 'test'}, {title: 'test2'}] }">
-        <template x-for="post in posts">
-          <h2 x-text="post.title"></h2>
-        </template>
+    <section class="add-image" x-data="addImage">
+      <div class="container">
+        <button
+          x-on:click="toggle"
+          type="button"
+          class="toggle-form u-full-width block button-large"
+        >
+          Add Image
+        </button>
       </div>
 
-    <footer>
+      <dialog x-bind:open="open">
+        <form
+          x-on:submit.prevent="onSubmit"
+          method="dialog"
+          class="center u-max-full-width"
+        >
+          <h3>Add New Image</h3>
+          <img
+            x-show="preview"
+            x-bind:src="preview"
+            class="u-max-full-width preview"
+          />
+          <div class="input-field">
+            <label for="file" class="button">Select Image</label>
+            <input
+              x-show="false"
+              type="file"
+              x-model="file"
+              name="file"
+              id="file"
+              value="select and image"
+              accept="image/*"
+              x-on:change="onFileChange"
+            />
+          </div>
+          <button type="submit" class="button-primary block u-full-width">
+            Upload
+          </button>
+        </form>
+      </dialog>
+    </section>
+    <main class="container">
+      <section
+        class="available-images"
+        x-data="{ images: [] }"
+        x-init="images = await (await fetch('/api/images')).json()"
+      >
+        <h2>Available Images</h2>
+
+        <div class="grid">
+          <template x-for="image in images">
+            <figure>
+              <img
+                x-bind:src="image.link"
+                loading="lazy"
+                class="u-max-full-width"
+              />
+              <figcaption x-text="image.filename"></figcaption>
+            </figure>
+          </template>
+        </div>
+      </section>
+    </main>
+
+    <footer class="container center-text">
       <div x-data="{ date: new Date().getFullYear() }">
         Copyright © <span x-text="date"></span>
       </div>

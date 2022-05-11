@@ -64,4 +64,38 @@ export class FSHelper {
   static getExtension(path: string) {
     return extname(path).split(".")[1];
   }
+
+  static async scanDirectory(
+    dir: string,
+    { onlyFiles = false }: { onlyFiles?: boolean } = {}
+  ) {
+    const dirRead = await fs.readdir(dir);
+    if (!onlyFiles) return dirRead;
+
+    const files = [] as string[];
+
+    for (const _file of dirRead) {
+      const stat = await fs.stat(this.joinPath(dir, _file));
+      if (!stat.isDirectory()) files.push(_file);
+    }
+
+    return files;
+  }
+
+  static async scanDirectoryRecursively(dir: string, _files: string[] = []) {
+    const files = await fs.readdir(dir);
+
+    for (const i in files) {
+      const name = this.joinPath(dir, files[i]);
+      const stat = await fs.stat(name);
+
+      if (!stat.isDirectory()) {
+        _files.push(name);
+        continue;
+      }
+
+      await this.scanDirectoryRecursively(name, _files);
+    }
+    return _files;
+  }
 }

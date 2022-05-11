@@ -22,7 +22,8 @@ interface CacheOptions {
 }
 
 export class ImageHelper {
-  static IMAGES_DIR = "./public/images";
+  static IMAGES_FOLDER_NAME = "images";
+  static IMAGES_DIR = FSHelper.joinPath("./public", this.IMAGES_FOLDER_NAME);
   static CACHE_DIR = FSHelper.joinPath(this.IMAGES_DIR, "cache");
 
   static PLACEHOLDER_FILENAME = "placeholder";
