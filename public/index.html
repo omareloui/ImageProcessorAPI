@@ -32,8 +32,6 @@
           method="dialog"
           class="center u-max-full-width"
         >
-          <!--method="post" action="/api/images" enctype="multipart/form-data" -->
-
           <h3>Add New Image</h3>
           <img
             x-show="preview"
@@ -53,6 +51,8 @@
               x-on:change="onFileChange"
             />
           </div>
+
+          <p class="error danger-text" x-show="error" x-text="error"></p>
 
           <div class="row">
             <button
@@ -75,8 +75,8 @@
     <main class="container">
       <section
         class="available-images"
-        x-data="{ images: [] }"
-        x-init="images = await (await fetch('/api/images')).json()"
+        x-data="$store.images"
+        x-init="getImages"
       >
         <h2>Available Images</h2>
 
