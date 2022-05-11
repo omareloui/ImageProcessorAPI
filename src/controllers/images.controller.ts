@@ -1,5 +1,5 @@
 import type { RequestHandler } from "express";
-import { v4 as uuid } from "uuid";
+import { nanoid } from "nanoid";
 
 import { APIError, FSHelper, ImageHelper } from "../lib";
 
@@ -23,7 +23,7 @@ export class ImagesController {
       const originalExt = FSHelper.getExtension(
         file.originalname
       ).toLowerCase();
-      const newName = FSHelper.addExtension(uuid(), originalExt);
+      const newName = FSHelper.addExtension(nanoid(10), originalExt);
       const imagePath = FSHelper.joinPath(ImageHelper.IMAGES_DIR, newName);
 
       await FSHelper.createFile(imagePath, file.buffer);
