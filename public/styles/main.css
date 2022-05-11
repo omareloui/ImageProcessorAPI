@@ -88,6 +88,9 @@ h1 {
 .add-image .error:hover {
   border-color: var(--clr-danger);
 }
+.add-image .error svg {
+  height: 15px;
+}
 
 /* grid images */
 .available-images .grid {

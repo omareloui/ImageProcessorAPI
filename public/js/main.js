@@ -1,5 +1,7 @@
-import "https://unpkg.com/alpinejs";
-import "https://unpkg.com/feather-icons";
+import "alpine";
+import "feather-icons";
+
+feather.replace();
 
 Alpine.store("images", {
   images: [],
