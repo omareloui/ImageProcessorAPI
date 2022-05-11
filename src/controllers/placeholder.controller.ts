@@ -8,7 +8,7 @@ export class PlaceholderController {
     try {
       const { image, filetype, isFromCache } =
         await ImageHelper.createPlaceholder(options);
-      res.writeHead(isFromCache ? 304 : 200, {
+      res.writeHead(200, {
         "Content-Type": `image/${filetype}`,
         "Content-Length": image.length,
       });

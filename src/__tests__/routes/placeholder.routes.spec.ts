@@ -32,11 +32,6 @@ describe("Placeholder endpoint", () => {
       expect(res.status).toBe(200);
     });
 
-    it("should response with 304 status code on requesting a cached image on /api/placeholder", async () => {
-      const res = await request.get("/api/placeholder?h=200&w=400");
-      expect(res.status).toBe(304);
-    });
-
     it("should response with 400 status code on providing an invalid size /api/placeholder", async () => {
       const res = await request.get("/api/placeholder?w=200&h=this_is_height");
       expect(res.status).toBe(400);

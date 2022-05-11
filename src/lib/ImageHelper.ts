@@ -1,4 +1,4 @@
-import sharp from "sharp";
+import sharp, { FormatEnum } from "sharp";
 
 import {
   ImagePlaceholderOptions,
@@ -12,14 +12,16 @@ import { ColorHelper } from "./ColorHelper";
 interface CacheImagePathOptions {
   filename: string;
   newExt?: string;
-  w?: number;
-  h?: number;
+  width?: number;
+  height?: number;
 }
 
 interface CacheOptions {
   shouldCache?: boolean;
   cacheDir?: string;
 }
+
+// TODO: add max dimension
 
 export class ImageHelper {
   static IMAGES_FOLDER_NAME = "images";
@@ -36,7 +38,7 @@ export class ImageHelper {
     const options = this.parseCreatePlaceholderOptions(query);
     this.validateCreatePlaceholderOptions(options);
 
-    const { w, h, color } = options;
+    const { width, height, color } = options;
     const filetype = this.PLACEHOLDER_DEFAULT_FILETYPE;
 
     const imageFromCache = await this.getFromCache(cacheDir, {
@@ -55,8 +57,8 @@ export class ImageHelper {
 
     const newImageBuffer = await sharp({
       create: {
-        height: h,
-        width: w,
+        height,
+        width,
         background: color || ColorHelper.generateRandom(),
         channels: 3,
       },
@@ -87,7 +89,7 @@ export class ImageHelper {
     const options = this.parseOperateOptions(query);
     this.validateOperateOptions(options);
 
-    const { filename, w, h, filetype } = options;
+    const { filename, width, height, filetype } = options;
 
     const imageSrc = FSHelper.resolvePath(this.IMAGES_DIR, filename);
     await this.validateImageExistence(imageSrc);
@@ -105,7 +107,7 @@ export class ImageHelper {
       };
 
     const newImageBuffer = await sharp(imageSrc)
-      .resize(w, h)
+      .resize(width, height)
       .toFormat(filetype)
       .toBuffer();
 
@@ -136,50 +138,118 @@ export class ImageHelper {
   private static parseCreatePlaceholderOptions(
     query: any
   ): Partial<ImagePlaceholderOptions> {
-    const color = query.color || query.clr;
-    const { w, h } = this.parseSize(query);
-    return { color, w, h };
+    const options = {
+      color: query.color || query.clr,
+    } as Partial<ImagePlaceholderOptions>;
+
+    const w = this.parseValueFromAliases(query, ["width", "w"]);
+    if (w !== null) options.width = this.parseNumber(w);
+
+    const height = this.parseValueFromAliases(query, ["height", "h"]);
+    if (height !== null) options.height = this.parseNumber(height);
+
+    return options;
   }
 
   private static parseOperateOptions(query: any): Partial<OperateImageOptions> {
-    const filename = query.filename || query.file || query.image;
-    const filetype =
-      query.ext ||
-      query.extension ||
-      query.filetype ||
-      query.format ||
-      FSHelper.getExtension(filename || "") ||
+    const options = {} as Partial<OperateImageOptions>;
+
+    const filename = this.parseValueFromAliases(query, [
+      "filename",
+      "file",
+      "image",
+    ]);
+    if (filename !== null) options.filename = filename;
+
+    options.filetype =
+      (this.parseValueFromAliases(query, [
+        "ext",
+        "extension",
+        "filetype",
+        "format",
+      ]) as keyof FormatEnum) ||
+      FSHelper.getExtension(options.filename || "") ||
       "webp";
 
-    const { w, h } = this.parseSize(query);
-    return { filename, w, h, filetype };
+    const w = this.parseValueFromAliases(query, ["width", "w"]);
+    if (w !== null) options.width = this.parseNumber(w);
+
+    const h = this.parseValueFromAliases(query, ["height", "h"]);
+    if (h !== null) options.height = this.parseNumber(h);
+
+    const r = this.parseValueFromAliases(query, ["rotate", "r"]);
+    if (r !== null) options.rotate = this.parseNumber(r);
+
+    const flip = this.parseValueFromAliases(query, ["flip", "fy"]);
+    if (flip !== null) options.flip = this.parseBoolean(flip);
+
+    const flop = this.parseValueFromAliases(query, ["flop", "fx"]);
+    if (flop !== null) options.flop = this.parseBoolean(flop);
+
+    const median = this.parseValueFromAliases(query, ["median", "m"]);
+    if (median !== null) options.median = this.parseNumberOrBoolean(median);
+
+    const blur = this.parseValueFromAliases(query, ["blur", "b"]);
+    if (blur !== null) options.blur = this.parseNumberOrBoolean(blur);
+
+    const negate = this.parseValueFromAliases(query, ["negate", "n"]);
+    if (negate !== null) options.negate = this.parseBoolean(negate);
+
+    const grayscale = this.parseValueFromAliases(query, [
+      "grayscale",
+      "greyscale",
+      "g",
+    ]);
+    if (grayscale !== null) options.grayscale = this.parseBoolean(grayscale);
+
+    return options;
   }
 
-  private static parseSize(query: any) {
-    const w = query.w || query.width;
-    const h = query.h || query.height;
+  private static parseNumberOrBoolean(value: string | undefined) {
+    const bool = this.parseBoolean(value);
+    if (bool !== undefined) return bool;
 
-    const width = w ? parseInt(w) : undefined;
-    const height = h ? parseInt(h) : undefined;
+    const num = this.parseNumber(value);
+    if (num !== undefined) return num;
+    return false;
+  }
 
-    return { w: width, h: height };
+  private static parseBoolean(value: string | undefined) {
+    if (value === undefined || value.match(/^(true|yes|on)$/i)) return true;
+    if (value.match(/^(false|no|off)$/i)) return false;
+  }
+
+  private static parseNumber(value: string | undefined) {
+    const parsedNum = parseInt(value || "");
+    if (!isNaN(parsedNum)) return parsedNum;
+  }
+
+  private static parseValueFromAliases(
+    query: Record<string, string | undefined>,
+    props: string | string[]
+  ) {
+    if (typeof props === "string") props = [props];
+    for (const prop of props) {
+      if (prop in query) return query[prop];
+    }
+    return null;
   }
 
   // --- Validate --- //
   private static validateCreatePlaceholderOptions(
     options: Partial<ImagePlaceholderOptions>
   ): asserts options is ImagePlaceholderOptions {
-    const { w, h } = options;
-    if (!w) throw new Error("You have to provide a width.");
-    if (!h) throw new Error("You have to provide a height.");
+    const { width, height } = options;
+    if (!width) throw new Error("You have to provide a width.");
+    if (!height) throw new Error("You have to provide a height.");
   }
 
   private static validateOperateOptions(
     options: Partial<OperateImageOptions>
   ): asserts options is OperateImageOptions {
-    const { filename, w, h } = options;
+    const { filename, width, height } = options;
     if (!filename) throw new Error("You have to provide a filename.");
-    if (!w && !h) throw new Error("You have to provide a size.");
+    if (!width && !height) throw new Error("You have to provide a size.");
     if (
       options.filetype &&
       ![...Object.keys(sharp.format), "jpg"].includes(
@@ -217,13 +287,15 @@ export class ImageHelper {
 
   static getCachedImagePath(
     cacheDir: string,
-    { w, h, filename, newExt }: CacheImagePathOptions
+    { width, height, filename, newExt }: CacheImagePathOptions
   ) {
-    let name = "";
-    if (w) name += w;
-    if (h) name += `x${h}`;
-    name += `_${filename}`;
-    if (newExt) name = FSHelper.replaceExtension(name, newExt);
+    const oldExt = FSHelper.getExtension(filename);
+    let name = `${FSHelper.removeExtension(filename)}_`;
+
+    if (width) name += width;
+    if (height) name += `x${height}`;
+
+    name = FSHelper.replaceExtension(name, newExt || oldExt);
 
     return FSHelper.resolvePath(cacheDir, name);
   }

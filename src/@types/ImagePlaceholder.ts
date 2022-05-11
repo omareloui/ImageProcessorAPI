@@ -1,6 +1,6 @@
 export interface ImagePlaceholderOptions {
-  h: number;
-  w: number;
+  height: number;
+  width: number;
   color?: string;
 }
 

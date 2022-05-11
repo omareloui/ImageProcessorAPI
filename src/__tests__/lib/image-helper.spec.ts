@@ -70,7 +70,10 @@ describe("ImageHelper", () => {
     });
 
     it("should accept h or height and w or width as dimension queries", async () => {
-      const imageBuffer1 = await createPlaceholder({ h: "300", w: "400" });
+      const imageBuffer1 = await createPlaceholder({
+        height: "300",
+        width: "400",
+      });
       const imageBuffer2 = await createPlaceholder({
         height: "300",
         width: "400",
@@ -81,7 +84,7 @@ describe("ImageHelper", () => {
     });
 
     it("should cache the created image", async () => {
-      const options = { h: 300, w: 400 };
+      const options = { height: 300, width: 400 };
       await createPlaceholder(options, { shouldCache: true });
       const createdImagePath = ImageHelper.getCachedImagePath(CACHE_MOCK_DIR, {
         ...options,
@@ -96,7 +99,7 @@ describe("ImageHelper", () => {
     });
 
     it("should create the image with the default extension", async () => {
-      const options = { h: 135, w: 909 };
+      const options = { height: 135, width: 909 };
       await createPlaceholder(options, { shouldCache: true });
       const createdImagePath = ImageHelper.getCachedImagePath(CACHE_MOCK_DIR, {
         ...options,
@@ -115,7 +118,7 @@ describe("ImageHelper", () => {
     });
 
     it("should get image from cache if exists", async () => {
-      const options = { h: 300, w: 400 };
+      const options = { height: 300, width: 400 };
       const { isFromCache } = await createPlaceholder(options, {
         shouldCache: true,
       });
@@ -183,7 +186,10 @@ describe("ImageHelper", () => {
     });
 
     it("should work with on providing one of the two dimensions", async () => {
-      const { image } = await operate({ filename: "santamonica.jpg", h: 200 });
+      const { image } = await operate({
+        filename: "santamonica.jpg",
+        height: 200,
+      });
       expect(image).toBeTruthy();
     });
 
@@ -192,7 +198,7 @@ describe("ImageHelper", () => {
       try {
         await operate({
           filename: "santamonica.jpg",
-          h: 200,
+          height: 200,
           extension: "invalid_ext",
         });
       } catch (e) {
@@ -207,7 +213,7 @@ describe("ImageHelper", () => {
         const extension = "png";
         const options = {
           filename: "santamonica.jpg",
-          h: 200,
+          height: 200,
           extension,
         };
         const { filetype } = await operate(options, { shouldCache: true });
@@ -221,7 +227,6 @@ describe("ImageHelper", () => {
             filename: FSHelper.replaceExtension(options.filename, extension),
           }
         );
-        console.log(createdImagePath);
 
         const exists = await FSHelper.validateExistence(createdImagePath);
         expect(exists).toBeTrue();
@@ -231,7 +236,7 @@ describe("ImageHelper", () => {
         const extension = "tiff";
         const options = {
           filename: "icelandwaterfall.jpg",
-          h: 200,
+          height: 200,
           extension,
         };
         const { filetype } = await operate(options, { shouldCache: true });
@@ -255,7 +260,7 @@ describe("ImageHelper", () => {
       const extension = "gif";
       const options = {
         filename: "icelandwaterfall.jpg",
-        h: 500,
+        height: 500,
         extension,
       };
       const { isFromCache } = await operate(options, { shouldCache: true });
@@ -273,7 +278,7 @@ describe("ImageHelper", () => {
       const extension = "tiff";
       const options = {
         filename: "icelandwaterfall.jpg",
-        h: 500,
+        height: 500,
         extension,
       };
       await operate(options, { shouldCache: true });

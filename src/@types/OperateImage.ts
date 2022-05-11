@@ -5,8 +5,18 @@ const sharpInstance = sharp();
 export interface OperateImageOptions {
   filename: string;
   filetype: Parameters<typeof sharpInstance.toFormat>[0];
-  h?: number;
-  w?: number;
+
+  height?: number;
+  width?: number;
+
+  rotate?: number;
+  median?: boolean | number;
+  blur?: boolean | number;
+
+  flip?: boolean;
+  flop?: boolean;
+  negate?: boolean;
+  grayscale?: boolean;
 }
 
 export interface OperateImageReturn {
