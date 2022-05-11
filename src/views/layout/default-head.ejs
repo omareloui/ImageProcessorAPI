@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= title %></title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css"
+    />
+
+    <link rel="stylesheet" href="/styles/global.css" />
+    <% if(stylesFile) { %>
+    <link rel="stylesheet" href="/styles/<%= stylesFile %>.css" />
+    <% } %>
+
+    <script type="importmap">
+      {
+        "imports": {
+          "alpine": "https://unpkg.com/alpinejs",
+          "feather-icons": "https://unpkg.com/feather-icons"
+        }
+      }
+    </script>
+
+    <script src="/js/global.js" type="module" defer></script>
+    <% if(scriptFile) { %>
+    <script src="/js/<%= scriptFile %>.js" type="module" defer></script>
+    <% } %>
+  </head>
+
+  <body>

@@ -1,7 +1,4 @@
 import "alpine";
-import "feather-icons";
-
-feather.replace();
 
 Alpine.store("images", {
   images: [],

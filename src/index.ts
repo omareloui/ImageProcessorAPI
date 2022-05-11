@@ -12,6 +12,9 @@ const { port, isProd, isTestEnv } = config;
 
 const app = Express();
 
+app.set("view engine", "ejs");
+app.set("views", "./src/views");
+
 app.use(
   helmet({
     contentSecurityPolicy: false,
@@ -23,7 +26,8 @@ if (!isTestEnv) app.use(morgan(isProd ? "combined" : "dev"));
 
 app.use(Express.static("./public"));
 
-app.use("/api", routes);
+app.use(routes);
+
 app.use(errorHandler);
 
 function init() {

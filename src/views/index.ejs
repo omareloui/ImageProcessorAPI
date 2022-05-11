@@ -1,0 +1,86 @@
+<%- include("layout/default-head", { title: "Image Processor", stylesFile:
+"main", scriptFile: "main" }) %>
+
+<h1 class="center-text">Image Processor</h1>
+
+<section class="add-image" x-data="addImage">
+  <div class="container">
+    <button
+      x-on:click="toggle"
+      type="button"
+      class="toggle-form u-full-width block button-large"
+    >
+      Add Image
+    </button>
+  </div>
+
+  <dialog x-bind:open="open">
+    <form
+      x-on:submit.prevent="onSubmit"
+      method="dialog"
+      class="center u-max-full-width"
+    >
+      <h3>Add New Image</h3>
+      <img
+        x-show="preview"
+        x-bind:src="preview"
+        class="u-max-full-width preview"
+      />
+      <div class="input-field">
+        <label for="file" class="button">Select Image</label>
+        <input
+          x-show="false"
+          type="file"
+          x-model="file"
+          name="image"
+          id="file"
+          value="select and image"
+          accept="image/*"
+          x-on:change="onFileChange"
+        />
+      </div>
+
+      <p class="error danger-text" x-show="error">
+        <i data-feather="alert-octagon"></i> <span x-text="error"></span>
+      </p>
+
+      <div class="row">
+        <button
+          type="submit"
+          class="button-primary block u-full-width columns eight"
+        >
+          Upload
+        </button>
+        <button
+          type="button"
+          class="block u-full-width columns four"
+          x-on:click="cancel"
+        >
+          Cancel
+        </button>
+      </div>
+    </form>
+  </dialog>
+</section>
+<main class="container">
+  <section class="available-images" x-data="$store.images" x-init="getImages">
+    <h2>Available Images</h2>
+
+    <div class="grid">
+      <template x-for="image in images">
+        <a x-bind:href="`/${image.filename}`">
+          <figure>
+            <img
+              x-bind:src="image.link"
+              loading="lazy"
+              class="u-max-full-width"
+            />
+            <figcaption x-text="image.filename"></figcaption>
+          </figure>
+        </a>
+      </template>
+    </div>
+  </section>
+</main>
+
+<%- include("layout/default-footer") %>

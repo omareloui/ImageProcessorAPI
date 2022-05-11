@@ -1,13 +1,13 @@
 import { Router } from "express";
 
-import resizeRoutes from "./resize.routes";
-import placeholderRoutes from "./placeholder.routes";
-import imagesRoutes from "./images.routes";
+import resizeRoutes from "./api/resize.routes";
+import placeholderRoutes from "./api/placeholder.routes";
+import imagesRoutes from "./api/images.routes";
+import viewsRoutes from "./views.routes";
 
-const routes = Router();
+const router = Router();
 
-routes.use("/images", imagesRoutes);
-routes.use("/resize", resizeRoutes);
-routes.use("/placeholder", placeholderRoutes);
+router.use("/api", imagesRoutes, placeholderRoutes, resizeRoutes);
+router.use(viewsRoutes);
 
-export default routes;
+export default router;

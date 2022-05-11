@@ -1,0 +1,50 @@
+/* ====== Custom Properties ====== */
+:root {
+  --dialog-background: #93939377;
+
+  --clr-text: #222;
+  --clr-border: #888;
+  --clr-danger: #f14343;
+  --clr-danger-fade: #fbbdbd;
+  --clr-body-bg: #f5f5f5;
+}
+
+/* ====== Reset ====== */
+*,
+*::after,
+*::before {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* ====== globals ====== */
+body {
+  background: var(--clr-body-bg);
+}
+
+h1 {
+  margin: 50px 0;
+}
+
+/* ====== Utils ====== */
+.block {
+  display: block;
+}
+.center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.center-text {
+  text-align: center;
+}
+.button-large {
+  height: auto;
+  font-size: 1.5rem;
+  padding: 5px 20px;
+}
+.danger-text {
+  color: var(--clr-danger);
+}
