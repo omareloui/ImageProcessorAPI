@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Image Processor</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css"
+    />
+    <link rel="stylesheet" href="/styles/main.css" />
+    <script src="/js/main.js" type="module" defer></script>
+  </head>
+
+  <body>
+    <main class="container">
+      <h1 class="center-text">Image Processor</h1>
+
+      <div class="available-images" x-data="{ posts: [{title: 'test'}, {title: 'test2'}] }">
+        <template x-for="post in posts">
+          <h2 x-text="post.title"></h2>
+        </template>
+      </div>
+
+    <footer>
+      <div x-data="{ date: new Date().getFullYear() }">
+        Copyright © <span x-text="date"></span>
+      </div>
+    </footer>
+  </body>
+</html>

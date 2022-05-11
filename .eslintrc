@@ -1,4 +1,5 @@
 {
+  "ignorePatterns": "/public/js/**/*.js",
   "extends": [
     "airbnb",
     "airbnb/hooks",
@@ -11,5 +12,5 @@
     "prettier/prettier": [
       "error"
     ]
-  }
+  },
 }

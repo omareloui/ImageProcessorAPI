@@ -12,7 +12,13 @@ const { port, isProd, isTestEnv } = config;
 
 const app = Express();
 
-app.use(helmet());
+app.use(
+  helmet({
+    contentSecurityPolicy: false,
+    crossOriginResourcePolicy: false,
+    crossOriginEmbedderPolicy: false,
+  })
+);
 if (!isTestEnv) app.use(morgan(isProd ? "combined" : "dev"));
 
 app.use(Express.static("./public"));
