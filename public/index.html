@@ -32,6 +32,8 @@
           method="dialog"
           class="center u-max-full-width"
         >
+          <!--method="post" action="/api/images" enctype="multipart/form-data" -->
+
           <h3>Add New Image</h3>
           <img
             x-show="preview"
@@ -44,16 +46,29 @@
               x-show="false"
               type="file"
               x-model="file"
-              name="file"
+              name="image"
               id="file"
               value="select and image"
               accept="image/*"
               x-on:change="onFileChange"
             />
           </div>
-          <button type="submit" class="button-primary block u-full-width">
-            Upload
-          </button>
+
+          <div class="row">
+            <button
+              type="submit"
+              class="button-primary block u-full-width columns eight"
+            >
+              Upload
+            </button>
+            <button
+              type="button"
+              class="block u-full-width columns four"
+              x-on:click="cancel"
+            >
+              Cancel
+            </button>
+          </div>
         </form>
       </dialog>
     </section>

@@ -1,6 +1,7 @@
 import type { RequestHandler } from "express";
+import { v4 as uuid } from "uuid";
 
-import { FSHelper, ImageHelper } from "../lib";
+import { APIError, FSHelper, ImageHelper } from "../lib";
 
 export class ImagesController {
   public static getAll: RequestHandler = async (_req, res) => {
@@ -12,5 +13,27 @@ export class ImagesController {
       filename: img,
     }));
     res.send(prefixedImages);
+  };
+
+  public static saveImage: RequestHandler = async (req, res, next) => {
+    try {
+      const { file } = req;
+      if (!file) throw new APIError("You have to provide an image.", 400);
+
+      const originalExt = FSHelper.getExtension(
+        file.originalname
+      ).toLowerCase();
+      const newName = FSHelper.addExtension(uuid(), originalExt);
+      const imagePath = FSHelper.joinPath(ImageHelper.IMAGES_DIR, newName);
+
+      await FSHelper.createFile(imagePath, file.buffer);
+
+      res.send({
+        link: `/${ImageHelper.IMAGES_FOLDER_NAME}/${newName}`,
+        filename: newName,
+      });
+    } catch (e) {
+      next(e);
+    }
   };
 }
