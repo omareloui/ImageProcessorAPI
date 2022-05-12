@@ -47,6 +47,7 @@
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 50px;
+  align-items: start;
 }
 .available-images img {
   border-radius: 4px;

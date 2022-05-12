@@ -22,9 +22,9 @@
     >
       <h3>Add New Image</h3>
       <img
+        class="preview u-max-full-width no-select"
         x-show="preview"
         x-bind:src="preview"
-        class="u-max-full-width preview"
       />
       <div class="input-field">
         <label for="file" class="button">Select Image</label>
@@ -72,9 +72,9 @@
         <a x-bind:href="`/${image.filename}`">
           <figure>
             <img
+              class="u-max-full-width no-select"
               x-bind:src="image.link"
               loading="lazy"
-              class="u-max-full-width"
             />
             <figcaption x-text="image.filename"></figcaption>
           </figure>
