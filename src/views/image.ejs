@@ -22,12 +22,26 @@
   <div class="row">
     <div class="input-field columns six">
       <label for="width">Width</label>
-      <input type="number" name="width" id="width" class="u-full-width" />
+      <input
+        type="number"
+        name="width"
+        id="width"
+        class="u-full-width"
+        min="0"
+        max="10000"
+      />
     </div>
 
     <div class="input-field columns six">
       <label for="height">Height</label>
-      <input type="number" name="height" id="height" class="u-full-width" />
+      <input
+        type="number"
+        name="height"
+        id="height"
+        class="u-full-width"
+        min="0"
+        max="10000"
+      />
     </div>
   </div>
 
@@ -82,12 +96,26 @@
   <div class="row">
     <div class="input-field columns six">
       <label for="blur">Blur</label>
-      <input type="number" name="blur" id="blur" class="u-full-width" />
+      <input
+        type="number"
+        name="blur"
+        id="blur"
+        class="u-full-width"
+        min="1"
+        max="1000"
+      />
     </div>
 
     <div class="input-field columns six">
       <label for="median">Median</label>
-      <input type="number" name="median" id="median" class="u-full-width" />
+      <input
+        type="number"
+        name="median"
+        id="median"
+        class="u-full-width"
+        min="1"
+        max="1000"
+      />
     </div>
   </div>
 
@@ -113,7 +141,7 @@
 
   <div class="row" x-show="error">
     <div class="columns twelve error">
-      <p x-text="error"></p>
+      <p class="danger-text" x-text="error"></p>
     </div>
   </div>
 
