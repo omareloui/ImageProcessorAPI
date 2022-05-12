@@ -13,3 +13,11 @@
   display: block;
   border-radius: 4px;
 }
+
+.operate-form .row {
+  margin-bottom: 2rem;
+}
+
+.operate-form .input-field input[type="range"] {
+  margin-bottom: 0;
+}

@@ -15,9 +15,9 @@
 <form
   x-data="$store.resizeForm"
   x-on:submit.prevent="onSubmit"
-  class="container resize-form"
+  class="container operate-form"
 >
-  <h3>Resize image</h3>
+  <h3>Operate on image</h3>
 
   <div class="row">
     <div class="input-field columns six">
@@ -31,7 +31,87 @@
     </div>
   </div>
 
-  <button type="submit" class="button-primary u-full-width">Resize</button>
+  <div class="row">
+    <div class="input-field columns twelve">
+      <label for="rotate">Rotate</label>
+      <input
+        type="range"
+        name="rotate"
+        id="rotate"
+        class="u-full-width"
+        min="0"
+        max="360"
+        step="10"
+        value="0"
+        oninput="this.nextElementSibling.value = this.value"
+      />
+      <output class="center-text block">0</output>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="input-field columns three">
+      <label for="flip">
+        <input type="checkbox" id="flip" name="flip" />
+        Flip
+      </label>
+    </div>
+
+    <div class="input-field columns three">
+      <label for="flop">
+        <input type="checkbox" id="flop" name="flop" />
+        Flop
+      </label>
+    </div>
+
+    <div class="input-field columns three">
+      <label for="negate">
+        <input type="checkbox" id="negate" name="negate" />
+        Negate
+      </label>
+    </div>
+
+    <div class="input-field columns three">
+      <label for="grayscale">
+        <input type="checkbox" id="grayscale" name="grayscale" />
+        Grayscale
+      </label>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="input-field columns six">
+      <label for="blur">Blur</label>
+      <input type="number" name="blur" id="blur" class="u-full-width" />
+    </div>
+
+    <div class="input-field columns six">
+      <label for="median">Median</label>
+      <input type="number" name="median" id="median" class="u-full-width" />
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="columns twelve">
+      <label for="filetype">Filetype</label>
+      <select
+        class="u-full-width"
+        id="filetype"
+        name="filetype"
+        x-data="{options: ['jpg', 'png','webp', 'gif']}"
+      >
+        <template x-for="option in options">
+          <option
+            x-bind:value="option"
+            x-text="`.${option}`"
+            x-bind:selected="option === $store.image.ext"
+          ></option>
+        </template>
+      </select>
+    </div>
+  </div>
+
+  <button type="submit" class="button-primary u-full-width">Update</button>
 </form>
 
 <%- include("layout/default-footer") %>
