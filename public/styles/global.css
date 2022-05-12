@@ -49,3 +49,6 @@ footer > div {
 .danger-text {
   color: var(--clr-danger);
 }
+.large-text {
+  font-size: 2rem;
+}

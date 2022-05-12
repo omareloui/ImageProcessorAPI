@@ -13,9 +13,8 @@ Alpine.store("image", {
   previewImage: null,
 
   async getImage() {
-    const image = await (
-      await fetch(`/api/images/${originalImageName}`)
-    ).json();
+    const res = await fetch(`/api/images/${originalImageName}`);
+    const image = await res.json();
     this.image = image;
     this.previewImage = image.link;
   },

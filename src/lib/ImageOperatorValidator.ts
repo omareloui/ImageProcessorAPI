@@ -3,6 +3,7 @@ import sharp from "sharp";
 import { ImagePlaceholderOptions, OperateImageOptions } from "../@types";
 
 import { FSHelper } from "./FSHelper";
+import { ImageHelper } from "./ImageHelper";
 
 export class ImageOperatorValidator {
   private static FORMATS = [...Object.keys(sharp.format), "jpg"];
@@ -54,6 +55,12 @@ export class ImageOperatorValidator {
     const { width, height } = options;
     if (!width) throw new Error("You have to provide a width.");
     if (!height) throw new Error("You have to provide a height.");
+  }
+
+  static async validateImageExistenceByFilename(filename: string) {
+    const imageSrc = FSHelper.resolvePath(ImageHelper.IMAGES_DIR, filename);
+    const fileExists = await FSHelper.validateExistence(imageSrc);
+    if (!fileExists) throw new Error("Can't find the requested file.");
   }
 
   static async validateImageExistence(path: string) {
