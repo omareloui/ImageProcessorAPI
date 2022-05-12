@@ -17,10 +17,6 @@ interface CacheOptions {
   cacheDir?: string;
 }
 
-// TODO: add max dimension
-// TODO: validate the parsed data
-// TODO: add more options to the placeholder
-
 export class ImageHelper {
   static IMAGES_FOLDER_NAME = "images";
   static IMAGES_DIR = FSHelper.joinPath("./public", this.IMAGES_FOLDER_NAME);
@@ -132,8 +128,21 @@ export class ImageHelper {
   }
 
   // ====== utils ====== //
-  // prettier-ignore
-  private static createSharpInstance( imageSrc: string, { filetype, width, height, blur, flip, flop, grayscale, median, negate, rotate, }: OperateImageOptions) {
+  private static createSharpInstance(
+    imageSrc: string,
+    {
+      filetype,
+      width,
+      height,
+      blur,
+      flip,
+      flop,
+      grayscale,
+      median,
+      negate,
+      rotate,
+    }: OperateImageOptions
+  ) {
     const s = sharp(imageSrc).toFormat(filetype);
 
     if (width || height) s.resize(width, height);

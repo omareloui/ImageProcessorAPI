@@ -1,6 +1,22 @@
-import { FSHelper, ImageHelper, ImageCache } from "../../lib";
+import {
+  FSHelper,
+  ImageHelper,
+  ImageCache,
+  ImageOperatorValidator,
+} from "../../lib";
 
 describe("ImageHelper", () => {
+  async function getErrorMessage<T>(cb: Function) {
+    let msg;
+    try {
+      await cb();
+    } catch (e) {
+      const err = e as Error;
+      msg = err.message;
+    }
+    return msg;
+  }
+
   const CACHE_MOCK_DIR = FSHelper.joinPath(
     ImageHelper.IMAGES_DIR,
     "cache__mock"
@@ -143,47 +159,51 @@ describe("ImageHelper", () => {
       }: OperateImageParams[1] = {}
     ) => ImageHelper.operate(options, { cacheDir, shouldCache });
 
-    it("should throw an error on not providing at least one dimension", async () => {
-      let msg = "";
-      try {
-        await operate({ filename: "santamonica.jpg" });
-      } catch (e) {
-        const err = e as Error;
-        msg = err.message;
-      }
-      expect(msg).toMatch("You have to provide a size.");
-    });
-
-    it("should throw an error on providing both dimensions with invalid numbers", async () => {
-      let msg = "";
-      try {
-        await operate({ filename: "santamonica.jpg", width: "text" });
-      } catch (e) {
-        const err = e as Error;
-        msg = err.message;
-      }
-      expect(msg).toMatch("You have to provide a size.");
-    });
-
     it("should throw an error on not providing a filename", async () => {
-      let msg = "";
-      try {
-        await operate({ width: "300" });
-      } catch (e) {
-        const err = e as Error;
-        msg = err.message;
-      }
+      const msg = await getErrorMessage(() => operate({}));
       expect(msg).toMatch("You have to provide a filename.");
     });
 
+    it("should throw an error on not providing any operation", async () => {
+      const msg = await getErrorMessage(() =>
+        operate({ filename: "santamonica.jpg" })
+      );
+      expect(msg).toMatch("You have to provide at least one operation.");
+    });
+
+    it("should throw an error on if the only provided operation is the default", async () => {
+      const msg = await getErrorMessage(() =>
+        operate({
+          filename: "santamonica.jpg",
+          flip: false,
+        })
+      );
+      expect(msg).toMatch("You have to provide at least one operation.");
+    });
+
+    it("should throw an error on providing an invalid extension", async () => {
+      const msg = await getErrorMessage(() =>
+        operate({ filename: "santamonica.jpg", filetype: "invalid_ext" })
+      );
+      expect(msg).toMatch("You have to provide a valid file format");
+    });
+
+    it("should throw an error on providing a large width or height value", async () => {
+      const msg = await getErrorMessage(() =>
+        operate({
+          filename: "santamonica.jpg",
+          width: ImageOperatorValidator.MAX_DIMENSION + 1,
+        })
+      );
+      expect(msg).toMatch(
+        `You can't exceed ${ImageOperatorValidator.MAX_DIMENSION}px for dimension.`
+      );
+    });
+
     it("should throw an error if the requested file can't be found", async () => {
-      let msg = "";
-      try {
-        await operate({ filename: "some_invalid_filename.jpg", width: "300" });
-      } catch (e) {
-        const err = e as Error;
-        msg = err.message;
-      }
+      const msg = await getErrorMessage(() =>
+        operate({ filename: "some_invalid_filename.jpg", width: "300" })
+      );
       expect(msg).toMatch("Can't find the requested file.");
     });
 
@@ -195,19 +215,12 @@ describe("ImageHelper", () => {
       expect(image).toBeTruthy();
     });
 
-    it("should throw an error on providing an invalid extension", async () => {
-      let msg = "";
-      try {
-        await operate({
-          filename: "santamonica.jpg",
-          height: 200,
-          extension: "invalid_ext",
-        });
-      } catch (e) {
-        const err = e as Error;
-        msg = err.message;
-      }
-      expect(msg).toMatch("You have to provide a valid file format.");
+    it("should work on providing only a flip value", async () => {
+      const { image } = await operate({
+        filename: "santamonica.jpg",
+        flip: true,
+      });
+      expect(image).toBeTruthy();
     });
 
     it("should make the file with the provided extension", async () => {

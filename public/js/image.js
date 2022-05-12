@@ -26,42 +26,62 @@ Alpine.store("image", {
   },
 });
 
-Alpine.store("resizeForm", {
+Alpine.store("operateForm", {
   link: null,
+  error: null,
 
-  onSubmit(e) {
+  async onSubmit(e) {
+    this.error = null;
     const formData = new FormData(e.target);
     formData.append("image", originalImageName);
     const options = Object.fromEntries(formData.entries());
     this.updateImage(options);
   },
 
-  updateImage(options) {
+  async updateImage(options) {
     const link = this.generateLink(options);
     this.link = link;
 
-    Alpine.store("image").updatePreviewImage(link);
+    try {
+      await this.validateFromSever(link);
+      Alpine.store("image").updatePreviewImage(link);
+    } catch (e) {
+      this.error = e.message;
+    }
   },
 
-  generateLink({
-    image,
-    width,
-    height,
-    blur,
-    median,
-    rotate,
-    flip,
-    flop,
-    negate,
-    grayscale,
-    filetype,
-  }) {
-    // TODO: make it work without having to specify the height or width (needs some work in backend first)
+  generateLink(options) {
+    let {
+      image,
+      width,
+      height,
+      blur,
+      median,
+      rotate,
+      flip,
+      flop,
+      negate,
+      grayscale,
+      filetype,
+    } = options;
 
     width = parseInt(width);
     height = parseInt(height);
 
-    if (!width && !height) return Alpine.store("image").image.link;
+    const hasOperations = this.validateHasSomeOperation(options, [
+      "width",
+      "height",
+      "flip",
+      "flop",
+      "blur",
+      "grayscale",
+      "median",
+      "negate",
+      "rotate",
+    ]);
+
+    if (!hasOperations && filetype === Alpine.store("image").ext)
+      return Alpine.store("image").image.link;
 
     let link = `/api/operate?filename=${image}`;
 
@@ -81,5 +101,17 @@ Alpine.store("resizeForm", {
       link += `&ext=${filetype}`;
 
     return link;
+  },
+
+  validateHasSomeOperation(options, operations) {
+    const keys = Object.keys(options);
+    return operations.some(
+      o => keys.includes(o) && options[0] && options[o] !== "0"
+    );
+  },
+
+  async validateFromSever(link) {
+    const res = await fetch(link);
+    if (res.status >= 400) throw new Error(await res.text());
   },
 });

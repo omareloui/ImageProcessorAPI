@@ -21,3 +21,16 @@
 .operate-form .input-field input[type="range"] {
   margin-bottom: 0;
 }
+
+.operate-form .error {
+  border: 1px solid var(--clr-danger-fade);
+  padding: 5px 10px;
+  border-radius: 4px;
+  color: var(--clr-danger);
+}
+.operate-form .error:hover {
+  border-color: var(--clr-danger);
+}
+.operate-form .error p:last-child {
+  margin-bottom: 0;
+}

@@ -13,7 +13,7 @@
 </main>
 
 <form
-  x-data="$store.resizeForm"
+  x-data="$store.operateForm"
   x-on:submit.prevent="onSubmit"
   class="container operate-form"
 >
@@ -108,6 +108,12 @@
           ></option>
         </template>
       </select>
+    </div>
+  </div>
+
+  <div class="row" x-show="error">
+    <div class="columns twelve error">
+      <p x-text="error"></p>
     </div>
   </div>
 

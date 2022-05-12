@@ -85,9 +85,18 @@ export class ImageOperatorOptionsParser {
   }
 
   static parseBoolean(value: string | undefined) {
-    if (value === undefined || value === null) return;
-    if (value === "" || value.match(/^(true|yes|on)$/i)) return true;
-    if (value.match(/^(false|no|off)$/i)) return false;
+    if (
+      value === undefined ||
+      value === null ||
+      (value as unknown as boolean) === false
+    )
+      return;
+    if (
+      value === "" ||
+      (value as unknown as boolean) === true ||
+      value.match(/^(true|yes|on)$/i)
+    )
+      return true;
   }
 
   static parseNumber(value: string | undefined) {
