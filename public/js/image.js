@@ -106,7 +106,7 @@ Alpine.store("operateForm", {
   validateHasSomeOperation(options, operations) {
     const keys = Object.keys(options);
     return operations.some(
-      o => keys.includes(o) && options[0] && options[o] !== "0"
+      o => keys.includes(o) && options[o] && options[o] !== "0"
     );
   },
 
