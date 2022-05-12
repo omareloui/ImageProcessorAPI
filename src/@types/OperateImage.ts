@@ -8,15 +8,15 @@ export interface OperateImageOptions {
 
   height?: number;
   width?: number;
-
   rotate?: number;
-  median?: boolean | number;
-  blur?: boolean | number;
 
   flip?: boolean;
   flop?: boolean;
   negate?: boolean;
   grayscale?: boolean;
+
+  median?: boolean | number;
+  blur?: boolean | number;
 }
 
 export interface OperateImageReturn {

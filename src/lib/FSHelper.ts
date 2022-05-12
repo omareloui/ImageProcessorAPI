@@ -98,4 +98,8 @@ export class FSHelper {
     }
     return _files;
   }
+
+  static sanitizeFilename(filename: string) {
+    return filename.replace(/[^a-z0-9\-_\.]/gi, "_");
+  }
 }

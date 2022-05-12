@@ -9,19 +9,15 @@ import {
 import { FSHelper } from "./FSHelper";
 import { ColorHelper } from "./ColorHelper";
 
-interface CacheImagePathOptions {
-  filename: string;
-  newExt?: string;
-  width?: number;
-  height?: number;
-}
-
 interface CacheOptions {
   shouldCache?: boolean;
   cacheDir?: string;
 }
 
 // TODO: add max dimension
+// TODO: validate the parsed data
+// TODO: add more options to the placeholder
+// TODO: refactor the file
 
 export class ImageHelper {
   static IMAGES_FOLDER_NAME = "images";
@@ -47,6 +43,7 @@ export class ImageHelper {
         ImageHelper.PLACEHOLDER_FILENAME,
         filetype
       ),
+      filetype,
     });
     if (imageFromCache)
       return {
@@ -75,6 +72,7 @@ export class ImageHelper {
             ImageHelper.PLACEHOLDER_FILENAME,
             filetype
           ),
+          filetype,
         },
         newImageBuffer
       );
@@ -89,14 +87,13 @@ export class ImageHelper {
     const options = this.parseOperateOptions(query);
     this.validateOperateOptions(options);
 
-    const { filename, width, height, filetype } = options;
+    const { filename, filetype } = options;
 
     const imageSrc = FSHelper.resolvePath(this.IMAGES_DIR, filename);
     await this.validateImageExistence(imageSrc);
 
     const imageFromCache = await this.getFromCache(cacheDir, {
       ...options,
-      newExt: filetype as string,
       filename,
     });
     if (imageFromCache)
@@ -106,17 +103,16 @@ export class ImageHelper {
         filetype: filetype as string,
       };
 
-    const newImageBuffer = await sharp(imageSrc)
-      .resize(width, height)
-      .toFormat(filetype)
-      .toBuffer();
+    const newImageBuffer = await this.createSharpInstance(
+      imageSrc,
+      options
+    ).toBuffer();
 
     if (shouldCache)
       await this.cacheImage(
         cacheDir,
         {
           ...options,
-          newExt: filetype as string,
           filename,
         },
         newImageBuffer
@@ -134,6 +130,41 @@ export class ImageHelper {
   }
 
   // ====== utils ====== //
+  // --- Sharp --- //
+  private static createSharpInstance(
+    imageSrc: string,
+    {
+      filetype,
+      width,
+      height,
+      blur,
+      flip,
+      flop,
+      grayscale,
+      median,
+      negate,
+      rotate,
+    }: OperateImageOptions
+  ) {
+    const s = sharp(imageSrc).toFormat(filetype);
+
+    if (width || height) s.resize(width, height);
+
+    if (rotate) s.rotate(rotate);
+
+    if (flip) s.flip();
+    if (flop) s.flop();
+    if (negate) s.negate();
+    if (grayscale) s.grayscale();
+
+    if (grayscale) s.grayscale();
+
+    if (blur) s.blur(typeof blur === "number" ? blur : undefined);
+    if (median) s.median(typeof median === "number" ? median : undefined);
+
+    return s;
+  }
+
   // --- Parse --- //
   private static parseCreatePlaceholderOptions(
     query: any
@@ -142,11 +173,14 @@ export class ImageHelper {
       color: query.color || query.clr,
     } as Partial<ImagePlaceholderOptions>;
 
-    const w = this.parseValueFromAliases(query, ["width", "w"]);
-    if (w !== null) options.width = this.parseNumber(w);
+    const values = this.parseValues(query, [
+      ["width", "w"],
+      ["height", "h"],
+    ]);
 
-    const height = this.parseValueFromAliases(query, ["height", "h"]);
-    if (height !== null) options.height = this.parseNumber(height);
+    (["width", "height"] as const).forEach(x => {
+      if (x in values) options[x] = this.parseNumber(values[x]);
+    });
 
     return options;
   }
@@ -154,55 +188,55 @@ export class ImageHelper {
   private static parseOperateOptions(query: any): Partial<OperateImageOptions> {
     const options = {} as Partial<OperateImageOptions>;
 
-    const filename = this.parseValueFromAliases(query, [
-      "filename",
-      "file",
-      "image",
+    const values = this.parseValues(query, [
+      ["filename", "file", "image"],
+      ["filetype", "ext", "extension", "format"],
+      ["width", "w"],
+      ["height", "h"],
+      ["rotate", "r"],
+      ["flip", "fx"],
+      ["flop", "fy"],
+      ["median", "m"],
+      ["blur", "b"],
+      ["negate", "n"],
+      ["grayscale", "greyscale", "g"],
     ]);
-    if (filename !== null) options.filename = filename;
+
+    if (values.filename !== null) options.filename = values.filename;
 
     options.filetype =
-      (this.parseValueFromAliases(query, [
-        "ext",
-        "extension",
-        "filetype",
-        "format",
-      ]) as keyof FormatEnum) ||
+      (values.filetype as keyof FormatEnum) ||
       FSHelper.getExtension(options.filename || "") ||
       "webp";
 
-    const w = this.parseValueFromAliases(query, ["width", "w"]);
-    if (w !== null) options.width = this.parseNumber(w);
+    (["width", "height", "rotate"] as const).forEach(x => {
+      if (x in values) options[x] = this.parseNumber(values[x]);
+    });
 
-    const h = this.parseValueFromAliases(query, ["height", "h"]);
-    if (h !== null) options.height = this.parseNumber(h);
+    (["flip", "flop", "negate", "grayscale"] as const).forEach(x => {
+      if (x in values) options[x] = this.parseBoolean(values[x]);
+    });
 
-    const r = this.parseValueFromAliases(query, ["rotate", "r"]);
-    if (r !== null) options.rotate = this.parseNumber(r);
-
-    const flip = this.parseValueFromAliases(query, ["flip", "fy"]);
-    if (flip !== null) options.flip = this.parseBoolean(flip);
-
-    const flop = this.parseValueFromAliases(query, ["flop", "fx"]);
-    if (flop !== null) options.flop = this.parseBoolean(flop);
-
-    const median = this.parseValueFromAliases(query, ["median", "m"]);
-    if (median !== null) options.median = this.parseNumberOrBoolean(median);
-
-    const blur = this.parseValueFromAliases(query, ["blur", "b"]);
-    if (blur !== null) options.blur = this.parseNumberOrBoolean(blur);
-
-    const negate = this.parseValueFromAliases(query, ["negate", "n"]);
-    if (negate !== null) options.negate = this.parseBoolean(negate);
-
-    const grayscale = this.parseValueFromAliases(query, [
-      "grayscale",
-      "greyscale",
-      "g",
-    ]);
-    if (grayscale !== null) options.grayscale = this.parseBoolean(grayscale);
+    (["median", "blur"] as const).forEach(x => {
+      if (x in values) options[x] = this.parseNumberOrBoolean(values[x]);
+    });
 
     return options;
+  }
+
+  // Parse Utils //
+  private static parseValues<
+    T extends keyof OperateImageOptions | keyof ImagePlaceholderOptions
+  >(query: any, props: (T | string)[][]) {
+    const values = props.reduce((acc, curr) => {
+      const value = this.parseValueFromAliases(
+        query,
+        curr as unknown as string[]
+      );
+      if (value !== null) acc[curr[0] as T] = value;
+      return acc;
+    }, {} as Record<T, string | undefined>);
+    return values;
   }
 
   private static parseNumberOrBoolean(value: string | undefined) {
@@ -215,7 +249,8 @@ export class ImageHelper {
   }
 
   private static parseBoolean(value: string | undefined) {
-    if (value === undefined || value.match(/^(true|yes|on)$/i)) return true;
+    if (value === undefined || value === null) return;
+    if (value === "" || value.match(/^(true|yes|on)$/i)) return true;
     if (value.match(/^(false|no|off)$/i)) return false;
   }
 
@@ -267,7 +302,7 @@ export class ImageHelper {
   // --- Cache --- //
   private static async cacheImage(
     cacheDir: string,
-    options: CacheImagePathOptions,
+    options: OperateImageOptions | ImagePlaceholderOptions,
     image: Buffer
   ) {
     const dist = this.getCachedImagePath(cacheDir, options);
@@ -277,7 +312,7 @@ export class ImageHelper {
 
   private static async getFromCache(
     cacheDir: string,
-    options: CacheImagePathOptions
+    options: OperateImageOptions | ImagePlaceholderOptions
   ): Promise<Buffer | false> {
     const src = this.getCachedImagePath(cacheDir, options);
     const exists = await FSHelper.validateExistence(src);
@@ -287,16 +322,57 @@ export class ImageHelper {
 
   static getCachedImagePath(
     cacheDir: string,
-    { width, height, filename, newExt }: CacheImagePathOptions
+    options: OperateImageOptions | ImagePlaceholderOptions
   ) {
-    const oldExt = FSHelper.getExtension(filename);
+    const name = this.generateCacheImageFilename(options);
+    return FSHelper.resolvePath(cacheDir, name);
+  }
+
+  private static generateCacheImageFilename<
+    T extends OperateImageOptions & ImagePlaceholderOptions
+  >({
+    filename,
+    filetype,
+    height,
+    width,
+    rotate,
+
+    flip,
+    flop,
+    grayscale,
+    negate,
+
+    blur,
+    median,
+
+    color,
+  }: Partial<T>) {
+    if (!filename) filename = "not_set_name";
+
     let name = `${FSHelper.removeExtension(filename)}_`;
 
     if (width) name += width;
     if (height) name += `x${height}`;
+    if (rotate) name += `_r${rotate}`;
 
-    name = FSHelper.replaceExtension(name, newExt || oldExt);
+    if (flip) name += "_fx";
+    if (flop) name += "_fy";
+    if (grayscale) name += "_g";
+    if (negate) name += "_n";
 
-    return FSHelper.resolvePath(cacheDir, name);
+    if (blur) {
+      name += "_b";
+      if (typeof blur === "number") name += `${blur}`;
+    }
+    if (median) {
+      name += "_m";
+      if (typeof median === "number") name += `${median}`;
+    }
+
+    if (color) name += `_c${color}`;
+
+    name = FSHelper.replaceExtension(name, filetype as string);
+
+    return FSHelper.sanitizeFilename(name);
   }
 }

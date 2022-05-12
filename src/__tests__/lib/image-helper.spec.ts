@@ -92,6 +92,7 @@ describe("ImageHelper", () => {
           ImageHelper.PLACEHOLDER_FILENAME,
           ImageHelper.PLACEHOLDER_DEFAULT_FILETYPE
         ),
+        filetype: ImageHelper.PLACEHOLDER_DEFAULT_FILETYPE,
       });
 
       const exists = await FSHelper.validateExistence(createdImagePath);
@@ -107,6 +108,7 @@ describe("ImageHelper", () => {
           ImageHelper.PLACEHOLDER_FILENAME,
           ImageHelper.PLACEHOLDER_DEFAULT_FILETYPE
         ),
+        filetype: ImageHelper.PLACEHOLDER_DEFAULT_FILETYPE,
       });
 
       expect(createdImagePath).toMatch(
@@ -225,6 +227,7 @@ describe("ImageHelper", () => {
           {
             ...options,
             filename: FSHelper.replaceExtension(options.filename, extension),
+            filetype: extension,
           }
         );
 
@@ -248,6 +251,7 @@ describe("ImageHelper", () => {
           {
             ...options,
             filename: FSHelper.replaceExtension(options.filename, extension),
+            filetype: extension,
           }
         );
 
@@ -268,7 +272,7 @@ describe("ImageHelper", () => {
 
       const cacheImagePath = ImageHelper.getCachedImagePath(CACHE_MOCK_DIR, {
         ...options,
-        newExt: extension,
+        filetype: extension,
       });
       const exists = await FSHelper.validateExistence(cacheImagePath);
       expect(exists).toBeTrue();
