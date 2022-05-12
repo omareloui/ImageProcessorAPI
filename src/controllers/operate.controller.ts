@@ -6,7 +6,9 @@ export class OperateController {
   public static operate: RequestHandler = async (req, res, next) => {
     const options = req.query;
     try {
-      const { image, filetype } = await ImageHelper.operate(options);
+      const { image, filetype } = await ImageHelper.operate(
+        options as Record<string, string | undefined>
+      );
       res.writeHead(200, {
         "Content-Type": `image/${filetype}`,
         "Content-Length": image.length,

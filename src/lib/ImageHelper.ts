@@ -29,7 +29,7 @@ export class ImageHelper {
   static PLACEHOLDER_DEFAULT_FILETYPE = "webp" as const;
 
   static async createPlaceholder(
-    query: Record<string, unknown>,
+    query: Record<string, string | undefined>,
     { shouldCache = true, cacheDir = this.CACHE_DIR }: CacheOptions = {}
   ): Promise<ImagePlaceholderReturn> {
     const options = ImageOperatorOptionsParser.parsePlaceholderOptions(query);
@@ -82,7 +82,7 @@ export class ImageHelper {
   }
 
   static async operate(
-    query: Record<string, unknown>,
+    query: Record<string, string | undefined>,
     { shouldCache = true, cacheDir = this.CACHE_DIR }: CacheOptions = {}
   ): Promise<OperateImageReturn> {
     const options = ImageOperatorOptionsParser.parseOperateOptions(query);
