@@ -31,7 +31,9 @@ export const notFoundHandler: RequestHandler = (_req, res) => {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
-  if (err.statusCode === 404) render404(res);
-  else if (err.statusCode === 500) renderErrorPage(res, err as ErrorPageData);
-  else res.send(err.message);
+  if (err.statusCode === 404) return render404(res);
+  if (err.statusCode === 500) return renderErrorPage(res, err as ErrorPageData);
+
+  res.status(err.statusCode || 500);
+  return res.send(err.message);
 };
