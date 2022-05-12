@@ -10,7 +10,13 @@ stylesFile: "", scriptFile: "error" }) %>
 
   <p class="center-text large-text"><%= message %></p>
 
+  <% if (stack) { %>
   <pre><code><%= stack %></code></pre>
+  <% } %>
+
+  <p class="center-text">
+    <a href="/" class="button button-primary">Go back home</a>
+  </p>
 </main>
 
 <%- include("layout/default-footer") %>

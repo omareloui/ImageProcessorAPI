@@ -35,6 +35,10 @@ pre > code {
   overflow: auto;
 }
 
+[x-cloak] {
+  display: none;
+}
+
 /* ====== Utils ====== */
 .block {
   display: block;

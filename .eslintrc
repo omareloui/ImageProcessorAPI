@@ -25,7 +25,7 @@
     "@typescript-eslint"
   ],
   "rules": {
-    "prettier/prettier": "error",
+    "prettier/prettier": "warn",
     "no-continue": "off",
     "no-await-in-loop": "off",
     "no-param-reassign": "off",

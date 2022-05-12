@@ -5,7 +5,7 @@ import morgan from "morgan";
 import helmet from "helmet";
 
 import routes from "./routes";
-import { errorHandler } from "./utils";
+import { errorHandler, notFoundHandler } from "./utils";
 
 import config from "./config";
 
@@ -29,6 +29,7 @@ app.use(Express.static("./public"));
 
 app.use(routes);
 
+app.use("*", notFoundHandler);
 app.use(errorHandler);
 
 function init() {
