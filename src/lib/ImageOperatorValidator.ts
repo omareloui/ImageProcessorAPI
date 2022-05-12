@@ -7,6 +7,7 @@ import { ImageHelper } from "./ImageHelper";
 
 export class ImageOperatorValidator {
   private static FORMATS = [...Object.keys(sharp.format), "jpg"];
+
   static MAX_DIMENSION = 10000;
 
   static validateOperateOptions(

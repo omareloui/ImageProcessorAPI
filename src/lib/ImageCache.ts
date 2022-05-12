@@ -32,7 +32,7 @@ export class ImageCache {
 
   // prettier-ignore
   static generateFilename<T extends OperateImageOptions & ImagePlaceholderOptions>({
-    filename,
+    filename: _filename,
     filetype,
     height,
     width,
@@ -48,6 +48,7 @@ export class ImageCache {
 
     color,
   }: Partial<T>) {
+    let filename = _filename
     if (!filename) filename = "not_set_name";
 
     let name = `${FSHelper.removeExtension(filename)}_`;

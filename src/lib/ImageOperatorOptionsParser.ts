@@ -5,7 +5,9 @@ import { ImagePlaceholderOptions, OperateImageOptions } from "../@types";
 import { FSHelper } from "./FSHelper";
 
 export class ImageOperatorOptionsParser {
-  static parsePlaceholderOptions(query: any): Partial<ImagePlaceholderOptions> {
+  static parsePlaceholderOptions(
+    query: Record<string, string | undefined>
+  ): Partial<ImagePlaceholderOptions> {
     const options = {
       color: query.color || query.clr,
     } as Partial<ImagePlaceholderOptions>;
@@ -22,7 +24,9 @@ export class ImageOperatorOptionsParser {
     return options;
   }
 
-  static parseOperateOptions(query: any): Partial<OperateImageOptions> {
+  static parseOperateOptions(
+    query: Record<string, string | undefined>
+  ): Partial<OperateImageOptions> {
     const options = {} as Partial<OperateImageOptions>;
 
     const values = this.parseValues(query, [
@@ -62,8 +66,9 @@ export class ImageOperatorOptionsParser {
   }
 
   // Utils //
-  // prettier-ignore
-  static parseValues<T extends keyof OperateImageOptions | keyof ImagePlaceholderOptions>(query: any, props: (T | string)[][]) {
+  static parseValues<
+    T extends keyof OperateImageOptions | keyof ImagePlaceholderOptions
+  >(query: Record<string, string | undefined>, props: (T | string)[][]) {
     const values = props.reduce((acc, curr) => {
       const value = this.parseValueFromAliases(
         query,
@@ -90,18 +95,22 @@ export class ImageOperatorOptionsParser {
       value === null ||
       (value as unknown as boolean) === false
     )
-      return;
+      return undefined;
+
     if (
       value === "" ||
       (value as unknown as boolean) === true ||
       value.match(/^(true|yes|on)$/i)
     )
       return true;
+
+    return undefined;
   }
 
   static parseNumber(value: string | undefined) {
-    const parsedNum = parseInt(value || "");
-    if (!isNaN(parsedNum)) return parsedNum;
+    const parsedNum = parseInt(value || "", 10);
+    if (!Number.isNaN(parsedNum)) return parsedNum;
+    return undefined;
   }
 
   static parseValueFromAliases(

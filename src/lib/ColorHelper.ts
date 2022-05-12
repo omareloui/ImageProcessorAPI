@@ -22,7 +22,8 @@ export class ColorHelper {
 
   static generateRandom() {
     let color = "";
-    for (const _i of range(0, 5)) color += this.getRandomHex();
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    for (const i of range(0, 5)) color += this.getRandomHex();
     return `#${color.toUpperCase()}`;
   }
 

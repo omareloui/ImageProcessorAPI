@@ -19,14 +19,17 @@ interface CacheOptions {
 
 export class ImageHelper {
   static IMAGES_FOLDER_NAME = "images";
+
   static IMAGES_DIR = FSHelper.joinPath("./public", this.IMAGES_FOLDER_NAME);
+
   static CACHE_DIR = FSHelper.joinPath(this.IMAGES_DIR, "cache");
 
   static PLACEHOLDER_FILENAME = "placeholder";
+
   static PLACEHOLDER_DEFAULT_FILETYPE = "webp" as const;
 
   static async createPlaceholder(
-    query: any,
+    query: Record<string, unknown>,
     { shouldCache = true, cacheDir = this.CACHE_DIR }: CacheOptions = {}
   ): Promise<ImagePlaceholderReturn> {
     const options = ImageOperatorOptionsParser.parsePlaceholderOptions(query);
@@ -79,7 +82,7 @@ export class ImageHelper {
   }
 
   static async operate(
-    query: any,
+    query: Record<string, unknown>,
     { shouldCache = true, cacheDir = this.CACHE_DIR }: CacheOptions = {}
   ): Promise<OperateImageReturn> {
     const options = ImageOperatorOptionsParser.parseOperateOptions(query);

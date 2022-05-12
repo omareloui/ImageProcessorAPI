@@ -1,4 +1,5 @@
 import config from "../config";
+
 const { isProd } = config;
 
 export class APIError extends Error {

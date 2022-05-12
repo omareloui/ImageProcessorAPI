@@ -8,10 +8,10 @@
     "start": "cross-env NODE_ENV=production node dist/index",
     "dev": "cross-env NODE_ENV=development nodemon -w src src/index.ts",
     "test": "npm run build && cross-env NODE_ENV=test jasmine",
-    "lint": "eslint src",
+    "lint": "eslint ./src/**/*",
     "lint:fix": "eslint src --fix",
     "lint:check": "eslint --print-config .eslintrc",
-    "format": "prettier ./src/**/* --write"
+    "format": "prettier ./{src,public}/**/*.{[jt]s,css,json} --write"
   },
   "repository": {
     "type": "git",
@@ -31,6 +31,8 @@
     "@types/rimraf": "^3.0.2",
     "@types/sharp": "^0.30.2",
     "@types/supertest": "^2.0.12",
+    "@typescript-eslint/eslint-plugin": "^5.23.0",
+    "@typescript-eslint/parser": "^5.23.0",
     "eslint": "^8.15.0",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-config-prettier": "^8.5.0",
@@ -44,7 +46,6 @@
     "jasmine-spec-reporter": "^7.0.0",
     "nodemon": "^2.0.16",
     "prettier": "^2.6.2",
-    "rimraf": "^3.0.2",
     "supertest": "^6.2.3",
     "ts-node": "^10.7.0",
     "typescript": "^4.6.4"
@@ -58,6 +59,7 @@
     "morgan": "^1.10.0",
     "multer": "^1.4.4",
     "nanoid": "^3.3.4",
+    "rimraf": "^3.0.2",
     "sharp": "^0.30.4"
   }
 }

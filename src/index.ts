@@ -8,6 +8,7 @@ import routes from "./routes";
 import { errorHandler } from "./utils";
 
 import config from "./config";
+
 const { port, isProd, isTestEnv } = config;
 
 const app = Express();
@@ -32,6 +33,7 @@ app.use(errorHandler);
 
 function init() {
   app.listen(port, () => {
+    // eslint-disable-next-line no-console
     console.info(`Listening on http://127.0.0.1:${port}`);
   });
 }

@@ -74,9 +74,9 @@ export class FSHelper {
 
     const files = [] as string[];
 
-    for (const _file of dirRead) {
-      const stat = await fs.stat(this.joinPath(dir, _file));
-      if (!stat.isDirectory()) files.push(_file);
+    for (const currentFile of dirRead) {
+      const stat = await fs.stat(this.joinPath(dir, currentFile));
+      if (!stat.isDirectory()) files.push(currentFile);
     }
 
     return files;
@@ -85,8 +85,8 @@ export class FSHelper {
   static async scanDirectoryRecursively(dir: string, _files: string[] = []) {
     const files = await fs.readdir(dir);
 
-    for (const i in files) {
-      const name = this.joinPath(dir, files[i]);
+    for (const file of files) {
+      const name = this.joinPath(dir, file);
       const stat = await fs.stat(name);
 
       if (!stat.isDirectory()) {
@@ -100,6 +100,6 @@ export class FSHelper {
   }
 
   static sanitizeFilename(filename: string) {
-    return filename.replace(/[^a-z0-9\-_\.]/gi, "_");
+    return filename.replace(/[^a-z0-9\-_.]/gi, "_");
   }
 }
