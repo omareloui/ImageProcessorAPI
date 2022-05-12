@@ -1,4 +1,4 @@
-import { FSHelper, ImageHelper } from "../../lib";
+import { FSHelper, ImageHelper, ImageCache } from "../../lib";
 
 describe("ImageHelper", () => {
   const CACHE_MOCK_DIR = FSHelper.joinPath(
@@ -86,7 +86,7 @@ describe("ImageHelper", () => {
     it("should cache the created image", async () => {
       const options = { height: 300, width: 400 };
       await createPlaceholder(options, { shouldCache: true });
-      const createdImagePath = ImageHelper.getCachedImagePath(CACHE_MOCK_DIR, {
+      const createdImagePath = ImageCache.getPath(CACHE_MOCK_DIR, {
         ...options,
         filename: FSHelper.addExtension(
           ImageHelper.PLACEHOLDER_FILENAME,
@@ -102,7 +102,7 @@ describe("ImageHelper", () => {
     it("should create the image with the default extension", async () => {
       const options = { height: 135, width: 909 };
       await createPlaceholder(options, { shouldCache: true });
-      const createdImagePath = ImageHelper.getCachedImagePath(CACHE_MOCK_DIR, {
+      const createdImagePath = ImageCache.getPath(CACHE_MOCK_DIR, {
         ...options,
         filename: FSHelper.addExtension(
           ImageHelper.PLACEHOLDER_FILENAME,
@@ -222,14 +222,11 @@ describe("ImageHelper", () => {
 
         expect(filetype).toBe(extension);
 
-        const createdImagePath = ImageHelper.getCachedImagePath(
-          CACHE_MOCK_DIR,
-          {
-            ...options,
-            filename: FSHelper.replaceExtension(options.filename, extension),
-            filetype: extension,
-          }
-        );
+        const createdImagePath = ImageCache.getPath(CACHE_MOCK_DIR, {
+          ...options,
+          filename: FSHelper.replaceExtension(options.filename, extension),
+          filetype: extension,
+        });
 
         const exists = await FSHelper.validateExistence(createdImagePath);
         expect(exists).toBeTrue();
@@ -246,14 +243,11 @@ describe("ImageHelper", () => {
 
         expect(filetype).toBe(extension);
 
-        const createdImagePath = ImageHelper.getCachedImagePath(
-          CACHE_MOCK_DIR,
-          {
-            ...options,
-            filename: FSHelper.replaceExtension(options.filename, extension),
-            filetype: extension,
-          }
-        );
+        const createdImagePath = ImageCache.getPath(CACHE_MOCK_DIR, {
+          ...options,
+          filename: FSHelper.replaceExtension(options.filename, extension),
+          filetype: extension,
+        });
 
         const exists = await FSHelper.validateExistence(createdImagePath);
         expect(exists).toBeTrue();
@@ -270,7 +264,7 @@ describe("ImageHelper", () => {
       const { isFromCache } = await operate(options, { shouldCache: true });
       expect(isFromCache).toBeFalse();
 
-      const cacheImagePath = ImageHelper.getCachedImagePath(CACHE_MOCK_DIR, {
+      const cacheImagePath = ImageCache.getPath(CACHE_MOCK_DIR, {
         ...options,
         filetype: extension,
       });
