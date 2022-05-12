@@ -7,6 +7,8 @@
   --clr-danger: #f14343;
   --clr-danger-fade: #fbbdbd;
   --clr-body-bg: #f5f5f5;
+
+  --clr-code-bg: #ededed;
 }
 
 /* ====== Reset ====== */
@@ -26,6 +28,11 @@ body {
 h1,
 footer > div {
   margin: 50px 0;
+}
+
+pre > code {
+  background: var(--clr-code-bg);
+  overflow: auto;
 }
 
 /* ====== Utils ====== */

@@ -59,8 +59,7 @@ export class ImageOperatorValidator {
 
   static async validateImageExistenceByFilename(filename: string) {
     const imageSrc = FSHelper.resolvePath(ImageHelper.IMAGES_DIR, filename);
-    const fileExists = await FSHelper.validateExistence(imageSrc);
-    if (!fileExists) throw new Error("Can't find the requested file.");
+    await this.validateImageExistence(imageSrc);
   }
 
   static async validateImageExistence(path: string) {

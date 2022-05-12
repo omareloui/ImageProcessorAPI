@@ -1,12 +1,16 @@
 <%- include("layout/default-head", { title: "Image Processor | Error",
-stylesFile: "", scriptFile: "" }) %>
+stylesFile: "", scriptFile: "error" }) %>
 
 <main class="container">
   <h1 class="center-text">Something went wrong</h1>
+
   <h2 class="center-text" x-show="statusCode">
     <%= statusCode %> <%= statusMessage %>
   </h2>
+
   <p class="center-text large-text"><%= message %></p>
+
+  <pre><code><%= stack %></code></pre>
 </main>
 
 <%- include("layout/default-footer") %>

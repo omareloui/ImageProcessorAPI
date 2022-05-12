@@ -7,7 +7,7 @@ export class APIError extends Error {
   constructor(public message: string, public statusCode: number = 500) {
     super(message);
 
-    this.stack = isProd ? "🥞" : this.stack;
+    this.stack = isProd ? "" : this.stack;
     this.statusCode = statusCode;
 
     switch (statusCode) {
